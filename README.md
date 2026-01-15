@@ -1,9 +1,9 @@
-# AuraWear - Premium Fashion Rental Platform
+# Rentique - Premium Fashion Rental Platform
 
-AuraWear is a web-based luxury rental application designed to bridge the gap between high-end fashion and accessibility. It allows users to browse and rent premium dresses, suits, and accessories for special occasions, while offering administrators a streamlined interface to manage inventory.
+Rentique is a web-based luxury rental application designed to bridge the gap between high-end fashion and accessibility. It allows users to browse and rent premium dresses, suits, and accessories for special occasions, while offering administrators a streamlined interface to manage inventory.
 
 ## 🎯 Project Goal
-The main goal of AuraWear is to provide a seamless, aesthetically pleasing platform where:
+The main goal of Rentique is to provide a seamless, aesthetically pleasing platform where:
 - **Customers** can easily discover and rent luxury fashion items without the commitment of purchasing.
 - **Business Owners (Admins)** can efficiently manage their rental catalogue, updating stock and categories in real-time.
 
@@ -60,4 +60,4 @@ To access the Admin Console, use the following default credentials:
 - You can register a new account on the home page with any email/password.
 
 ---
-*Designed & Developed for AuraWear.*
+*Designed & Developed for Rentique.*
