@@ -76,7 +76,7 @@
                 <a href="/category/Kids" class="nav-link">Kids</a>
             </div>
             <div class="nav-right">
-                <a href="#" class="nav-action">
+                <a href="/my_rentals" class="nav-action">
                     <i class="fa-solid fa-bag-shopping"></i>
                     <span>My Rentals</span>
                 </a>
@@ -125,8 +125,9 @@
                             item.category.split('-')[-1].strip() }}</span>
                     </div>
                     <div class="item-price" style="margin-top: 5px;">₹{{ item.price }} / day</div>
-                    <button class="btn btn-primary"
-                        style="width: 100%; margin-top: 1rem; font-size: 0.8rem; padding: 0.6rem;">Rent Now</button>
+                    <a href="/product/{{ item._id }}" class="btn btn-primary"
+                        style="width: 100%; margin-top: 1rem; font-size: 0.8rem; padding: 0.6rem; text-align:center; display:block;">Rent
+                        Now</a>
                 </div>
             </div>
             {% endfor %}

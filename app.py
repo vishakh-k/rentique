@@ -12,6 +12,7 @@ client = MongoClient('mongodb+srv://vishakhkt:vishakh2003@cluster0.hkgog.mongodb
 db = client['aurawear_db']
 users_collection = db['users']
 items_collection = db['items']
+bookings_collection = db['bookings']
 
 # --- Routes ---
 
@@ -98,6 +99,68 @@ def category_page(category_name):
     items = list(items_collection.find({'category': {'$regex': category_name, '$options': 'i'}}))
     
     return render_template('category.html', items=items, category_name=category_name)
+
+@app.route('/product/<item_id>')
+def product_detail(item_id):
+    if 'user' not in session:
+        return redirect(url_for('index'))
+    
+    item = items_collection.find_one({'_id': ObjectId(item_id)})
+    if not item:
+        return redirect(url_for('home'))
+        
+    return render_template('product_detail.html', item=item)
+
+from datetime import datetime
+
+@app.route('/book/<item_id>', methods=['POST'])
+def book_item(item_id):
+    if 'user' not in session:
+        return redirect(url_for('index'))
+    
+    item = items_collection.find_one({'_id': ObjectId(item_id)})
+    if not item:
+        return redirect(url_for('home'))
+
+    start_date = request.form.get('start_date')
+    end_date = request.form.get('end_date')
+    
+    # Calculate days
+    try:
+        d1 = datetime.strptime(start_date, "%Y-%m-%d")
+        d2 = datetime.strptime(end_date, "%Y-%m-%d")
+        delta = d2 - d1
+        days = max(1, delta.days) # Minimum 1 day
+    except:
+        days = 1
+        
+    total_price = int(item['price']) * days
+    
+    bookings_collection.insert_one({
+        'user_email': session['user'],
+        'item_id': str(item['_id']),
+        'item_name': item['name'],
+        'category': item['category'],
+        'image_url': item.get('image_url'),
+        'start_date': start_date,
+        'end_date': end_date,
+        'total_price': total_price,
+        'status': 'Pending',
+        'booked_at': datetime.now()
+    })
+    
+    flash('Your rental booked successfully!')
+    return redirect(url_for('my_rentals'))
+
+@app.route('/my_rentals')
+def my_rentals():
+    if 'user' not in session:
+        return redirect(url_for('index'))
+        
+    # Get user bookings (sort by specific field if needed, currently just grabbing all)
+    user_bookings = list(bookings_collection.find({'user_email': session['user']}).sort('booked_at', -1))
+    
+    return render_template('my_rentals.html', bookings=user_bookings)
 
 @app.route('/admin')
 def admin():

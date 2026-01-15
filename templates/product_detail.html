@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rentique | {{ item.name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .product-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            padding: 4rem 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+            align-items: start;
+        }
+
+        .product-image-large {
+            width: 100%;
+            height: 600px;
+            /* Fixed height for consistency */
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-info {
+            padding-top: 1rem;
+        }
+
+        .tags {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .tag {
+            background: #eee;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .product-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: #2c2c2c;
+            margin-bottom: 1rem;
+        }
+
+        .product-desc {
+            color: var(--text-muted);
+            line-height: 1.8;
+            margin-bottom: 2rem;
+            font-size: 1.05rem;
+        }
+
+        .price-tag {
+            font-size: 2rem;
+            color: var(--primary-color);
+            font-weight: 700;
+            font-family: 'Playfair Display', serif;
+            margin-bottom: 2rem;
+        }
+
+        .price-tag span {
+            font-size: 1rem;
+            color: var(--text-muted);
+            font-weight: normal;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* Booking Card */
+        .booking-card {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .booking-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            color: #2c2c2c;
+        }
+
+        .date-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .date-group label {
+            display: block;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+            color: #555;
+        }
+
+        .confirm-btn {
+            width: 100%;
+            padding: 1rem;
+            background: #D2B48C;
+            /* Beige/Gold from image */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .confirm-btn:hover {
+            background: #C19A6B;
+        }
+
+        @media (max-width: 900px) {
+            .product-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .product-image-large {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="container nav-content">
+            <div class="nav-left">
+                <i class="fa-solid fa-sparkles"
+                    style="color: var(--primary-color); margin-right: 0.5rem; font-size: 1.2rem;"></i>
+                <a href="/home" class="nav-logo brand-font" style="font-size: 1.5rem; letter-spacing: 1px;">RENTIQUE</a>
+            </div>
+            <div class="nav-center">
+                <a href="/category/Women" class="nav-link">Women</a>
+                <a href="/category/Men" class="nav-link">Men</a>
+                <a href="/category/Kids" class="nav-link">Kids</a>
+            </div>
+            <div class="nav-right">
+                <a href="/my_rentals" class="nav-action">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <span>My Rentals</span>
+                </a>
+                <div class="user-profile-circle">V</div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="product-container">
+        <!-- Left: Image -->
+        <div>
+            {% if item.image_url %}
+            <img src="{{ item.image_url }}" alt="{{ item.name }}" class="product-image-large">
+            {% else %}
+            <div class="product-image-large"
+                style="background:#eee; display:flex; align-items:center; justify-content:center;">
+                <i class="fa-solid fa-shirt" style="font-size: 5rem; color:#ccc;"></i>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Right: Details -->
+        <div class="product-info">
+            <div class="tags">
+                <span class="tag">{{ item.category }}</span>
+                <!-- Added a static tag for now since sub-categories aren't distinct in DB yet -->
+                <span class="tag">Premium</span>
+            </div>
+
+            <h1 class="product-title">{{ item.name }}</h1>
+
+            <p class="product-desc">
+                <!-- Fallback description since DB doesn't have one yet, using a generic luxury text -->
+                Eleganance redefined. This {{ item.name }} is crafted from premium materials, perfect for weddings,
+                parties, and special occasions.
+                Experience luxury without the commitment.
+            </p>
+
+            <div class="price-tag">₹{{ item.price }} <span>/ day</span></div>
+
+            <div class="booking-card">
+                <h3 class="booking-title">Book This Item</h3>
+
+                <form action="/book/{{ item._id }}" method="POST">
+                    <div class="date-inputs">
+                        <div class="date-group">
+                            <label>Start Date</label>
+                            <input type="date" name="start_date" required style="margin-bottom:0;">
+                        </div>
+                        <div class="date-group">
+                            <label>End Date</label>
+                            <input type="date" name="end_date" required style="margin-bottom:0;">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="confirm-btn">
+                        <i class="fa-solid fa-check"></i> Confirm Booking
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

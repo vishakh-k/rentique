@@ -32,7 +32,7 @@
 
             <!-- Right: Actions -->
             <div class="nav-right">
-                <a href="#" class="nav-action">
+                <a href="/my_rentals" class="nav-action">
                     <i class="fa-solid fa-bag-shopping"></i>
                     <span>My Rentals</span>
                 </a>
@@ -164,9 +164,10 @@
                     <div class="pickup-date">
                         <i class="fa-regular fa-calendar"></i> Pickup: {{ item.pickup_date }}
                     </div>
-                    <button class="btn btn-primary" style="width: 100%;">
+                    <a href="/product/{{ item._id }}" class="btn btn-primary"
+                        style="width: 100%; text-align:center; display:block;">
                         Rent Now
-                    </button>
+                    </a>
                 </div>
             </div>
             {% endfor %}
