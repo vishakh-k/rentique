@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rentique | Admin Console</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=2">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .admin-layout {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 2rem;
+            padding: 2rem 0;
+        }
+
+        .sidebar-form {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+            height: fit-content;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="container nav-content">
+            <div class="nav-logo brand-font">Rentique <span
+                    style="font-size: 1rem; color: var(--text-muted); font-family: 'Outfit';">| Admin</span></div>
+            <form action="/logout" method="POST" style="margin:0;">
+                <button type="submit" class="btn btn-outline">Logout</button>
+            </form>
+        </div>
+    </nav>
+
+    <div class="container admin-layout">
+
+        <!-- Add Item Form -->
+        <div class="sidebar-form">
+            <h3 style="margin-bottom: 1.5rem; color: var(--primary-color);">Add New Inventory</h3>
+            <form action="/add_item" method="POST">
+
+                <label style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block;">Item Name</label>
+                <input type="text" name="name" required placeholder="e.g. Royal Blue Silk Saree">
+
+                <label style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block;">Category</label>
+                <select name="category" required>
+                    <option value="Women - Dress">Women - Dress</option>
+                    <option value="Women - Jewelry">Women - Jewelry</option>
+                    <option value="Men - Wear">Men - Wear</option>
+                    <option value="Men - Accessories">Men - Accessories</option>
+                    <option value="Kids">Kids</option>
+                </select>
+
+                <label style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block;">Rental Price (₹)</label>
+                <input type="number" name="price" required placeholder="1500">
+
+                <label style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block;">Pickup Date
+                    Availability</label>
+                <input type="date" name="pickup_date" required>
+
+                <label style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block;">Image URL</label>
+                <input type="url" name="image_url" placeholder="https://...">
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Add to
+                    Collection</button>
+            </form>
+        </div>
+
+        <!-- Inventory List -->
+        <div class="inventory-list">
+            <div class="admin-header" style="margin-top: 0; padding-top: 0;">
+                <h2>Current Inventory</h2>
+                <div style="color: var(--text-muted);">{{ items|length }} Items Listed</div>
+            </div>
+
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.category }}</td>
+                        <td>₹{{ item.price }}</td>
+                        <td>{{ item.pickup_date }}</td>
+                        <td>
+                            <!-- Mock buttons for now -->
+                            <!-- Ideally these would be forms or hook into JS -->
+                            <form action="/delete_item/{{ item._id }}" method="POST" style="display:inline;">
+                                <button type="submit" class="action-btn delete-btn"><i class="fa fa-trash"></i></button>
+                            </form>
+                            <!-- Update not fully implemented in this MVP HTML, simplified to just Delete -->
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rentique | Women's Collection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .category-header {
+            background-color: #fff;
+            padding: 2rem 5%;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .back-link {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary-color);
+        }
+
+        .cat-title-large {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            color: #2c2c2c;
+            margin-bottom: 0.5rem;
+        }
+
+        .filter-bar {
+            padding: 2rem 5%;
+            display: flex;
+            gap: 1rem;
+            background-color: #FDFBF7;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1.5rem;
+            border-radius: 5px;
+            border: 1px solid var(--border-color);
+            background: #fff;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .filter-btn.active,
+        .filter-btn:hover {
+            background: #e2e8f0;
+            color: #2c2c2c;
+            border-color: #cbd5e1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="container nav-content">
+            <div class="nav-left">
+                <i class="fa-solid fa-sparkles"
+                    style="color: var(--primary-color); margin-right: 0.5rem; font-size: 1.2rem;"></i>
+                <a href="/home" class="nav-logo brand-font" style="font-size: 1.5rem; letter-spacing: 1px;">RENTIQUE</a>
+            </div>
+            <div class="nav-center">
+                <a href="/category/Women" class="nav-link active">Women</a>
+                <a href="/category/Men" class="nav-link">Men</a>
+                <a href="/category/Kids" class="nav-link">Kids</a>
+            </div>
+            <div class="nav-right">
+                <a href="#" class="nav-action">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <span>My Rentals</span>
+                </a>
+                <div class="user-profile-circle">V</div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="category-header">
+        <a href="/home" class="back-link"><i class="fa-solid fa-chevron-left"></i> Back to Home</a>
+        <h1 class="cat-title-large">{{ category_name }}'s Collection</h1>
+        {% if category_name == 'Women' %}
+        <p style="color: var(--text-muted);">Elegant dresses, sarees & jewellery</p>
+        {% elif category_name == 'Men' %}
+        <p style="color: var(--text-muted);">Formal suits, sherwanis & accessories</p>
+        {% elif category_name == 'Kids' %}
+        <p style="color: var(--text-muted);">Adorable outfits for little ones</p>
+        {% endif %}
+    </div>
+
+    <!-- Filter Buttons (Visual Only for now) -->
+    <div class="filter-bar">
+        <button class="filter-btn active">All</button>
+        <button class="filter-btn">Clothes</button>
+        <button class="filter-btn">Jewellery</button>
+    </div>
+
+    <div class="container" style="padding: 2rem 0;">
+        <div class="items-grid">
+            {% if items %}
+            {% for item in items %}
+            <div class="item-card">
+                <div class="item-image">
+                    {% if item.image_url %}
+                    <img src="{{ item.image_url }}" alt="{{ item.name }}"
+                        style="width:100%; height:100%; object-fit:cover;">
+                    {% else %}
+                    <i class="fa-solid fa-shirt" style="font-size: 3rem;"></i>
+                    {% endif %}
+                </div>
+                <div class="item-details">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <h3 class="item-name" style="color: var(--text-main); font-size: 1.1rem;">{{ item.name }}</h3>
+                        <span
+                            style="font-size: 0.7rem; background:#eee; padding: 2px 8px; border-radius: 10px; color:#555;">{{
+                            item.category.split('-')[-1].strip() }}</span>
+                    </div>
+                    <div class="item-price" style="margin-top: 5px;">₹{{ item.price }} / day</div>
+                    <button class="btn btn-primary"
+                        style="width: 100%; margin-top: 1rem; font-size: 0.8rem; padding: 0.6rem;">Rent Now</button>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div style="grid-column: 1/-1; text-align: center; padding: 4rem;">
+                <h3>No items found in this collection.</h3>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+</body>
+
+</html>

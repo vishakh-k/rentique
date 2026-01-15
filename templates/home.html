@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rentique | Collection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=2">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container nav-content">
+            <!-- Left: Logo -->
+            <div class="nav-left">
+                <i class="fa-solid fa-sparkles"
+                    style="color: var(--primary-color); margin-right: 0.5rem; font-size: 1.2rem;"></i>
+                <a href="/home" class="nav-logo brand-font" style="font-size: 1.5rem; letter-spacing: 1px;">RENTIQUE</a>
+            </div>
+
+            <!-- Center: Categories -->
+            <div class="nav-center">
+                <a href="/category/Women" class="nav-link">Women</a>
+                <a href="/category/Men" class="nav-link">Men</a>
+                <a href="/category/Kids" class="nav-link">Kids</a>
+            </div>
+
+            <!-- Right: Actions -->
+            <div class="nav-right">
+                <a href="#" class="nav-action">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <span>My Rentals</span>
+                </a>
+
+                <div class="user-profile-circle">
+                    V
+                </div>
+                <!-- Keeping Logout accessible via small text/icon if needed, or imply it's in the profile menu -->
+                <form action="/logout" method="POST" style="display:inline; margin-left: 10px;">
+                    <button type="submit"
+                        style="background:none; border:none; cursor:pointer; color: var(--text-muted);">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="hero-wrapper">
+        <div class="hero-content">
+            <h1 class="hero-title">Rent the Look,<br><span>Own the Moment</span></h1>
+            <p class="hero-subtitle">Premium fashion rentals for every occasion. Wear designer pieces without the
+                designer price tag.</p>
+            <form action="/home" method="GET" style="display: flex; gap: 10px; margin-bottom: 2rem;">
+                <input type="text" name="q" placeholder="What are you looking for?"
+                    value="{{ request.args.get('q', '') }}"
+                    style="padding: 1rem; border-radius: 50px; border: 1px solid var(--border-color); width: 70%;">
+                <button type="submit" class="btn btn-primary" style="padding: 0 2rem;">Search</button>
+            </form>
+            <a href="#collection" class="btn btn-primary">Explore Collection <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+    </div>
+
+    <!-- How It Works Section -->
+    <div class="process-section">
+        <h2 class="brand-font" style="font-size: 2.5rem; margin-bottom: 1rem;">How It Works</h2>
+        <p style="color: var(--text-muted);">Renting has never been easier. Three simple steps to your perfect look.</p>
+
+        <div class="process-grid">
+            <div class="process-card">
+                <div class="process-icon">01</div>
+                <h3>Browse & Select</h3>
+                <p style="color: var(--text-muted); margin-top: 0.5rem;">Explore our curated collection and find the
+                    perfect outfit for your occasion.</p>
+            </div>
+            <div class="process-card">
+                <div class="process-icon">02</div>
+                <h3>Choose Your Dates</h3>
+                <p style="color: var(--text-muted); margin-top: 0.5rem;">Select your rental period and we’ll calculate
+                    the total price automatically.</p>
+            </div>
+            <div class="process-card">
+                <div class="process-icon">03</div>
+                <h3>Wear & Return</h3>
+                <p style="color: var(--text-muted); margin-top: 0.5rem;">Enjoy your rental and return it hassle-free
+                    when your period ends.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shop by Category -->
+    <div class="category-section">
+        <div class="container text-center" style="margin-bottom: 3rem; text-align: center;">
+            <h2 class="brand-font" style="font-size: 2.5rem;">Shop by Category</h2>
+            <p style="color: var(--text-muted);">Discover our curated collections for every member of your family</p>
+        </div>
+
+        <div class="category-grid">
+            <!-- Women -->
+            <div class="category-card" onclick="window.location.href='/category/Women'">
+                <img src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=1983&auto=format&fit=crop"
+                    alt="Women">
+                <div class="category-overlay">
+                    <h3 class="cat-title">Women</h3>
+                    <p style="font-size: 0.9rem; margin-bottom: 1rem; opacity: 0.9;">Elegant dresses, sarees & jewellery
+                    </p>
+                    <span class="cat-link">Explore <i class="fa-solid fa-arrow-right"></i></span>
+                </div>
+            </div>
+
+            <!-- Men -->
+            <div class="category-card" onclick="window.location.href='/category/Men'">
+                <img src="https://images.unsplash.com/photo-1594938298603-c8148c472f85?q=80&w=2070&auto=format&fit=crop"
+                    alt="Men">
+                <div class="category-overlay">
+                    <h3 class="cat-title">Men</h3>
+                    <p style="font-size: 0.9rem; margin-bottom: 1rem; opacity: 0.9;">Formal suits, sherwanis &
+                        accessories</p>
+                    <span class="cat-link">Explore <i class="fa-solid fa-arrow-right"></i></span>
+                </div>
+            </div>
+
+            <!-- Kids -->
+            <div class="category-card" onclick="window.location.href='/category/Kids'">
+                <img src="https://images.unsplash.com/photo-1621452773781-0f992ee03591?q=80&w=1974&auto=format&fit=crop"
+                    alt="Kids">
+                <div class="category-overlay">
+                    <h3 class="cat-title">Kids</h3>
+                    <p style="font-size: 0.9rem; margin-bottom: 1rem; opacity: 0.9;">Adorable outfits for little ones
+                    </p>
+                    <span class="cat-link">Explore <i class="fa-solid fa-arrow-right"></i></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Collection Grid (Original Items) -->
+    <div id="collection" class="container" style="padding: 4rem 2rem;">
+        <h2 class="brand-font" style="text-align: center; font-size: 2.5rem; margin-bottom: 3rem;">Latest Arrivals</h2>
+
+        <div class="items-grid">
+            {% if items %}
+            {% for item in items %}
+            <div class="item-card">
+                <div class="item-image">
+                    {% if item.image_url %}
+                    <img src="{{ item.image_url }}" alt="{{ item.name }}"
+                        style="width:100%; height:100%; object-fit:cover;">
+                    {% else %}
+                    <i class="fa-solid fa-shirt" style="font-size: 3rem;"></i>
+                    {% endif %}
+                </div>
+                <div class="item-details">
+                    <div class="item-category">{{ item.category }}</div>
+                    <h3 class="item-name" style="color: var(--text-main);">{{ item.name }}</h3>
+                    <!-- Fixed text color for light theme -->
+                    <div class="item-price">₹{{ item.price }} / day</div>
+                    <div class="pickup-date">
+                        <i class="fa-regular fa-calendar"></i> Pickup: {{ item.pickup_date }}
+                    </div>
+                    <button class="btn btn-primary" style="width: 100%;">
+                        Rent Now
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div style="grid-column: 1/-1; text-align: center; padding: 4rem;">
+                <h3>No items found in the collection.</h3>
+                <p style="color: var(--text-muted);">The boutique is currently being restocked or check your search
+                    terms.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+
+</html>
