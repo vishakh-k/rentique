@@ -253,6 +253,10 @@ select:focus {
     display: block;
 }
 
+.mobile-menu-btn {
+    display: none;
+}
+
 @media (max-width: 768px) {
     .landing-logo-img {
         height: 120px;
@@ -324,9 +328,7 @@ select:focus {
     }
 }
 
-.mobile-menu-btn {
-    display: none;
-}
+
 
 /* --- Hero Section --- */
 .hero-wrapper {
