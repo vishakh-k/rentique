@@ -255,7 +255,7 @@ select:focus {
 
 @media (max-width: 768px) {
     .landing-logo-img {
-        height: 100px;
+        height: 120px;
         /* Smaller on mobile */
     }
 
@@ -263,6 +263,69 @@ select:focus {
         height: 50px;
         /* Smaller on mobile */
     }
+
+    .navbar {
+        padding: 0.5rem 0;
+    }
+
+    .nav-content {
+        flex-wrap: wrap;
+        height: auto;
+        padding: 0.5rem 1rem;
+    }
+
+    .nav-left {
+        flex: 1;
+        justify-content: flex-start;
+    }
+
+    .mobile-menu-btn {
+        display: block;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--primary-color);
+    }
+
+    .nav-center,
+    .nav-right {
+        display: none;
+        width: 100%;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .nav-center.active,
+    .nav-right.active {
+        display: flex;
+    }
+
+    .hero-title {
+        font-size: 2.5rem;
+    }
+
+    .container {
+        padding: 0 1rem;
+    }
+
+    .process-section,
+    .category-section {
+        padding: 3rem 1rem;
+    }
+
+    .category-card {
+        height: 350px;
+    }
+
+    /* Admin Table Scroll */
+    .admin-table-container {
+        overflow-x: auto;
+    }
+}
+
+.mobile-menu-btn {
+    display: none;
 }
 
 /* --- Hero Section --- */

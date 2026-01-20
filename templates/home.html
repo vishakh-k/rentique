@@ -24,15 +24,20 @@
                 </a>
             </div>
 
+            <!-- Mobile Menu Button -->
+            <div class="mobile-menu-btn" onclick="toggleMenu()">
+                <i class="fa-solid fa-bars"></i>
+            </div>
+
             <!-- Center: Categories -->
-            <div class="nav-center">
+            <div class="nav-center" id="navCenter">
                 <a href="/category/Women" class="nav-link">Women</a>
                 <a href="/category/Men" class="nav-link">Men</a>
                 <a href="/category/Kids" class="nav-link">Kids</a>
             </div>
 
             <!-- Right: Actions -->
-            <div class="nav-right">
+            <div class="nav-right" id="navRight">
                 <a href="/my_rentals" class="nav-action">
                     <i class="fa-solid fa-bag-shopping"></i>
                     <span>My Rentals</span>
@@ -51,6 +56,15 @@
             </div>
         </div>
     </nav>
+
+    <script>
+        function toggleMenu() {
+            const navCenter = document.getElementById('navCenter');
+            const navRight = document.getElementById('navRight');
+            navCenter.classList.toggle('active');
+            navRight.classList.toggle('active');
+        }
+    </script>
 
     <!-- Hero Section -->
     <div class="hero-wrapper">
