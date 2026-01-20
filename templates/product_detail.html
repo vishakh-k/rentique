@@ -146,9 +146,10 @@
     <nav class="navbar">
         <div class="container nav-content">
             <div class="nav-left">
-                <i class="fa-solid fa-sparkles"
-                    style="color: var(--primary-color); margin-right: 0.5rem; font-size: 1.2rem;"></i>
-                <a href="/home" class="nav-logo brand-font" style="font-size: 1.5rem; letter-spacing: 1px;">RENTIQUE</a>
+                <a href="/home" class="nav-logo" style="display: block;">
+                    <img src="{{ url_for('static', filename='images/rentique_brand_logo.png') }}" alt="Rentique"
+                        style="height: 75px; width: auto;">
+                </a>
             </div>
             <div class="nav-center">
                 <a href="/category/Women" class="nav-link">Women</a>

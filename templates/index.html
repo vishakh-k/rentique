@@ -6,13 +6,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rentique | Premium Rentals</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=2">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
 <body>
 
     <div class="landing-wrapper">
+        <!-- Logo positioned top-left -->
+        <!-- Logo positioned top-left -->
+        <a href="/" class="landing-logo" style="position: absolute; top: 1.5rem; left: 2rem; text-decoration: none;">
+            <img src="{{ url_for('static', filename='images/rentique_brand_logo.png') }}" alt="Rentique"
+                style="height: 160px; width: auto; display: block;">
+        </a>
+
         <div class="auth-container">
-            <h1 class="brand-logo">Rentique</h1>
+            <!-- Removed centered logo -->
             <p class="auth-subtitle">Elevate your style. Rent the luxury.</p>
 
             <!-- Login Form -->
