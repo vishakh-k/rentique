@@ -164,8 +164,8 @@
             {% for item in items %}
             <div class="item-card">
                 <div class="item-image">
-                    {% if item.image_url %}
-                    <img src="{{ item.image_url }}" alt="{{ item.name }}"
+                    {% if item.image %}
+                    <img src="{{ item.image }}" alt="{{ item.name }}"
                         style="width:100%; height:100%; object-fit:cover;">
                     {% else %}
                     <i class="fa-solid fa-shirt" style="font-size: 3rem;"></i>
@@ -177,10 +177,14 @@
                     <!-- Fixed text color for light theme -->
                     <div class="item-price">₹{{ item.price }} / day</div>
                     <div class="pickup-date">
-                        <i class="fa-regular fa-calendar"></i> Pickup: {{ item.pickup_date }}
+                        {% if item.availability %}
+                        <i class="fa-solid fa-check-circle" style="color: green;"></i> Available Now
+                        {% else %}
+                        <i class="fa-regular fa-clock"></i> Currently Rented
+                        {% endif %}
                     </div>
-                    <a href="/product/{{ item._id }}" class="btn btn-primary"
-                        style="width: 100%; text-align:center; display:block;">
+                    <a href="/product/{% if item.outfit_id %}{{ item.outfit_id }}{% else %}{{ item._id }}{% endif %}"
+                        class="btn btn-primary" style="width: 100%; text-align:center; display:block;">
                         Rent Now
                     </a>
                 </div>

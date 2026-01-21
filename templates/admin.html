@@ -59,12 +59,14 @@
                 <label style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block;">Rental Price (₹)</label>
                 <input type="number" name="price" required placeholder="1500">
 
-                <label style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block;">Pickup Date
-                    Availability</label>
-                <input type="date" name="pickup_date" required>
+                <label style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block;">Description</label>
+                <textarea name="description" placeholder="Details about the outfit..."
+                    style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 1rem; font-family: inherit;"></textarea>
 
-                <label style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block;">Image URL</label>
-                <input type="url" name="image_url" placeholder="https://...">
+                <!-- Availability defaults to true in backend -->
+
+                <label style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block;">Image (Path or URL)</label>
+                <input type="text" name="image" placeholder="Image file name or URL">
 
                 <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Add to
                     Collection</button>
@@ -84,7 +86,7 @@
                         <th>Item</th>
                         <th>Category</th>
                         <th>Price</th>
-                        <th>Date</th>
+                        <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -94,14 +96,20 @@
                         <td>{{ item.name }}</td>
                         <td>{{ item.category }}</td>
                         <td>₹{{ item.price }}</td>
-                        <td>{{ item.pickup_date }}</td>
                         <td>
-                            <!-- Mock buttons for now -->
-                            <!-- Ideally these would be forms or hook into JS -->
-                            <form action="/delete_item/{{ item._id }}" method="POST" style="display:inline;">
+                            {% if item.availability %}
+                            <span style="color: green;">Available</span>
+                            {% else %}
+                            <span style="color: #999;">Unavailable</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <!-- Form to delete item -->
+                            <form
+                                action="/delete_item/{% if item.outfit_id %}{{ item.outfit_id }}{% else %}{{ item._id }}{% endif %}"
+                                method="POST" style="display:inline;">
                                 <button type="submit" class="action-btn delete-btn"><i class="fa fa-trash"></i></button>
                             </form>
-                            <!-- Update not fully implemented in this MVP HTML, simplified to just Delete -->
                         </td>
                     </tr>
                     {% endfor %}

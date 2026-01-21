@@ -125,8 +125,8 @@
             {% for item in items %}
             <div class="item-card">
                 <div class="item-image">
-                    {% if item.image_url %}
-                    <img src="{{ item.image_url }}" alt="{{ item.name }}"
+                    {% if item.image %}
+                    <img src="{{ item.image }}" alt="{{ item.name }}"
                         style="width:100%; height:100%; object-fit:cover;">
                     {% else %}
                     <i class="fa-solid fa-shirt" style="font-size: 3rem;"></i>
@@ -140,7 +140,17 @@
                             item.category.split('-')[-1].strip() }}</span>
                     </div>
                     <div class="item-price" style="margin-top: 5px;">₹{{ item.price }} / day</div>
-                    <a href="/product/{{ item._id }}" class="btn btn-primary"
+
+                    <div style="font-size: 0.8rem; margin-top: 5px;">
+                        {% if item.availability %}
+                        <span style="color: green;">Available</span>
+                        {% else %}
+                        <span style="color: #999;">Rented Out</span>
+                        {% endif %}
+                    </div>
+
+                    <a href="/product/{% if item.outfit_id %}{{ item.outfit_id }}{% else %}{{ item._id }}{% endif %}"
+                        class="btn btn-primary"
                         style="width: 100%; margin-top: 1rem; font-size: 0.8rem; padding: 0.6rem; text-align:center; display:block;">Rent
                         Now</a>
                 </div>

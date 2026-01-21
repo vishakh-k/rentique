@@ -183,8 +183,8 @@
     <div class="product-container">
         <!-- Left: Image -->
         <div>
-            {% if item.image_url %}
-            <img src="{{ item.image_url }}" alt="{{ item.name }}" class="product-image-large">
+            {% if item.image %}
+            <img src="{{ item.image }}" alt="{{ item.name }}" class="product-image-large">
             {% else %}
             <div class="product-image-large"
                 style="background:#eee; display:flex; align-items:center; justify-content:center;">
@@ -204,18 +204,23 @@
             <h1 class="product-title">{{ item.name }}</h1>
 
             <p class="product-desc">
-                <!-- Fallback description since DB doesn't have one yet, using a generic luxury text -->
+                {% if item.description %}
+                {{ item.description }}
+                {% else %}
                 Eleganance redefined. This {{ item.name }} is crafted from premium materials, perfect for weddings,
                 parties, and special occasions.
                 Experience luxury without the commitment.
+                {% endif %}
             </p>
 
             <div class="price-tag">₹{{ item.price }} <span>/ day</span></div>
 
             <div class="booking-card">
+                {% if item.availability %}
                 <h3 class="booking-title">Book This Item</h3>
 
-                <form action="/book/{{ item._id }}" method="POST">
+                <form action="/book/{% if item.outfit_id %}{{ item.outfit_id }}{% else %}{{ item._id }}{% endif %}"
+                    method="POST">
                     <div class="date-inputs">
                         <div class="date-group">
                             <label>Start Date</label>
@@ -231,6 +236,14 @@
                         <i class="fa-solid fa-check"></i> Confirm Booking
                     </button>
                 </form>
+                {% else %}
+                <div
+                    style="text-align: center; color: #d32f2f; background: #ffebee; border-radius: 8px; padding: 1rem;">
+                    <i class="fa-solid fa-ban" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
+                    <h3 style="margin-bottom: 0.5rem; font-size: 1.2rem; color: #c62828;">Currently Unavailable</h3>
+                    <p style="font-size: 0.9rem; color: #b71c1c;">This outfit is currently rented out.</p>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>

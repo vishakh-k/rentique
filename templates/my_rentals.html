@@ -199,8 +199,8 @@
             {% if bookings %}
             {% for booking in bookings %}
             <div class="rental-card">
-                {% if booking.image_url %}
-                <img src="{{ booking.image_url }}" alt="{{ booking.item_name }}" class="rental-img">
+                {% if booking.image %}
+                <img src="{{ booking.image }}" alt="{{ booking.item_name }}" class="rental-img">
                 {% else %}
                 <div class="rental-img" style="display:flex; align-items:center; justify-content:center;">
                     <i class="fa-solid fa-bag-shopping" style="font-size:2rem; color:#ccc;"></i>
@@ -218,12 +218,14 @@
                     <h3 class="rental-title">{{ booking.item_name }}</h3>
                     <div class="rental-date">
                         <i class="fa-regular fa-calendar"></i>
-                        {{ booking.start_date }} - {{ booking.end_date }}
+                        {{ booking.rental_date if booking.rental_date else booking.start_date }} - {{
+                        booking.return_date if booking.return_date else booking.end_date }}
                     </div>
                 </div>
 
                 <div class="rental-price">
-                    <div class="price-amount">₹{{ booking.total_price }}</div>
+                    <div class="price-amount">₹{{ booking.total_amount if booking.total_amount else booking.total_price
+                        }}</div>
                     <div class="price-label">Total</div>
                 </div>
             </div>
