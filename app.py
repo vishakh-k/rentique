@@ -73,8 +73,8 @@ def login():
     user = users_collection.find_one({'$or': [{'email': username_or_email}, {'name': username_or_email}]})
     
     # If explicit admin credentials used and not in DB, we can manually handle or just rely on DB
-    if username_or_email == 'admin@aurawear.com' and password == 'admin123':
-        session['user'] = 'admin@aurawear.com'
+    if username_or_email == 'admin@rentique.com' and password == 'admin123':
+        session['user'] = 'admin@rentique.com'
         session['role'] = 'Admin'
         session['user_id'] = 1 # Static ID for superadmin
         return redirect(url_for('admin'))
@@ -245,14 +245,53 @@ def cancel_rental(rental_id):
     outfit_id = booking.get('outfit_id')
     if outfit_id:
         try:
+            # Try as integer ID first
             oid = int(outfit_id)
-            items_collection.update_one({'outfit_id': oid}, {'$set': {'availability': True}})
-        except:
-            # If outfit_id was stored as str or ObjectId string
-            pass
-            # Also try finding by _id if outfit_id matched nothing (complex, but 'outfit_id' is preferred key)
+            result = items_collection.update_one({'outfit_id': oid}, {'$set': {'availability': True}})
+            # If no document modified, maybe it's using _id or something else, but strictly our add_item uses int.
+            # But let's be safe for legacy/mixed data.
+            if result.modified_count == 0:
+                 # Check if it was an ObjectId string?
+                 pass
+        except ValueError:
+            # If convert to int fails, it might be an ObjectId string
+            try:
+                items_collection.update_one({'_id': ObjectId(outfit_id)}, {'$set': {'availability': True}})
+            except:
+                pass
 
-    flash('Rental cancelled successfully.')
+    flash('Rental cancelled successfully. Item is now available for others.')
+    return redirect(url_for('my_rentals'))
+
+@app.route('/delete_rental/<rental_id>', methods=['POST'])
+def delete_rental(rental_id):
+    if 'user' not in session:
+        return redirect(url_for('index'))
+    
+    try:
+        r_id = int(rental_id)
+        booking = bookings_collection.find_one({'rental_id': r_id})
+    except:
+        return redirect(url_for('my_rentals'))
+    
+    if booking:
+        # If deleting an active/pending rental, we must release the item item
+        if booking.get('status') != 'Cancelled':
+             outfit_id = booking.get('outfit_id')
+             if outfit_id:
+                try:
+                    oid = int(outfit_id)
+                    items_collection.update_one({'outfit_id': oid}, {'$set': {'availability': True}})
+                except:
+                     try:
+                        items_collection.update_one({'_id': ObjectId(outfit_id)}, {'$set': {'availability': True}})
+                     except:
+                        pass
+        
+        # Remove from DB
+        bookings_collection.delete_one({'rental_id': r_id})
+        flash('Rental record deleted successfully.')
+    
     return redirect(url_for('my_rentals'))
 
 @app.route('/my_rentals')
