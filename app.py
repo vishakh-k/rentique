@@ -145,12 +145,19 @@ def book_item(item_id):
     # Retrieve Item
     try:
         query_id = int(item_id)
+        # Find item that is available (though availability check should be done)
+        # If we want to strictly allow only if available:
         item = items_collection.find_one({'outfit_id': query_id})
     except ValueError:
         item = items_collection.find_one({'_id': ObjectId(item_id)})
 
     if not item:
         return redirect(url_for('home'))
+    
+    # Check availability again to be safe
+    if not item.get('availability', True): # Default to True if key missing, but if False prevent
+         flash('Sorry, this item is currently unavailable.')
+         return redirect(url_for('product_detail', item_id=item_id))
 
     start_date_str = request.form.get('start_date')
     end_date_str = request.form.get('end_date')
@@ -176,21 +183,76 @@ def book_item(item_id):
         if user_rec:
             user_id = user_rec.get('user_id', 0)
     
-    # Dictionary: rental_id, user_id, outfit_id, rental_date, return_date, total_amount
+    # Insert Booking
     bookings_collection.insert_one({
         'rental_id': rental_id,
         'user_id': user_id,
-        'outfit_id': item.get('outfit_id', str(item['_id'])), # Use outfit_id if avail
+        'outfit_id': item.get('outfit_id', str(item['_id'])),
         'rental_date': start_date_str,
         'return_date': end_date_str,
         'total_amount': total_amount,
-        # Keeping extra fields for UI display ease, though strict dict doesn't specify them
         'item_name': item['name'],
         'image': item.get('image'),
-        'status': 'Pending'
+        'status': 'Pending',
+        'created_at': datetime.now(), # Store creation time for cancellation logic
+        'payment_mode': 'COD'
     })
     
-    flash('Your rental booked successfully!')
+    # Update Item Availability to False so no one else can book it
+    if item.get('outfit_id'):
+         items_collection.update_one({'outfit_id': item['outfit_id']}, {'$set': {'availability': False}})
+    else:
+         items_collection.update_one({'_id': item['_id']}, {'$set': {'availability': False}})
+
+    flash('Your rental booked successfully! Payment: Cash on Delivery.')
+    return redirect(url_for('my_rentals'))
+
+@app.route('/cancel_rental/<rental_id>', methods=['POST'])
+def cancel_rental(rental_id):
+    if 'user' not in session:
+        return redirect(url_for('index'))
+    
+    try:
+        r_id = int(rental_id)
+        booking = bookings_collection.find_one({'rental_id': r_id})
+    except:
+        return redirect(url_for('my_rentals'))
+    
+    if not booking:
+        flash('Booking not found.')
+        return redirect(url_for('my_rentals'))
+        
+    # Check time limit (2 hours)
+    created_at = booking.get('created_at')
+    if created_at:
+        # Ensure created_at is a datetime object (pymongo usually handles this if inserted as datetime)
+        time_diff = datetime.now() - created_at
+        hours_passed = time_diff.total_seconds() / 3600
+        
+        if hours_passed > 2:
+            flash('Cancellation period (2 hours) has expired.')
+            return redirect(url_for('my_rentals'))
+    else:
+        # If legacy record without timestamp, maybe allow or disallow. Let's allow for now or disallow.
+        # Safe choice: Allow if status is Pending, but for strict 2hr rule, maybe disallow.
+        # Let's assume new bookings only have created_at.
+        pass
+
+    # Update Booking Status
+    bookings_collection.update_one({'rental_id': r_id}, {'$set': {'status': 'Cancelled'}})
+    
+    # Make item available again
+    outfit_id = booking.get('outfit_id')
+    if outfit_id:
+        try:
+            oid = int(outfit_id)
+            items_collection.update_one({'outfit_id': oid}, {'$set': {'availability': True}})
+        except:
+            # If outfit_id was stored as str or ObjectId string
+            pass
+            # Also try finding by _id if outfit_id matched nothing (complex, but 'outfit_id' is preferred key)
+
+    flash('Rental cancelled successfully.')
     return redirect(url_for('my_rentals'))
 
 @app.route('/my_rentals')
@@ -198,15 +260,14 @@ def my_rentals():
     if 'user' not in session:
         return redirect(url_for('index'))
         
-    # Get user bookings (sort by specific field if needed, currently just grabbing all)
     user_id = session.get('user_id')
     if user_id:
         user_bookings = list(bookings_collection.find({'user_id': user_id}).sort('rental_date', -1))
     else:
-        # Fallback for old data
         user_bookings = list(bookings_collection.find({'user_email': session['user']}).sort('rental_date', -1))
     
-    return render_template('my_rentals.html', bookings=user_bookings)
+    # Pass current time for template comparison if needed, though backend handles the action
+    return render_template('my_rentals.html', bookings=user_bookings, now=datetime.now(), timedelta=lambda x: x.total_seconds()/3600)
 
 @app.route('/admin')
 def admin():

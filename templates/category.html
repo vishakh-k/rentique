@@ -58,6 +58,21 @@
             color: #2c2c2c;
             border-color: #cbd5e1;
         }
+
+        @media (max-width: 768px) {
+            .cat-title-large {
+                font-size: 2rem;
+            }
+
+            .filter-bar {
+                padding: 1rem;
+                overflow-x: auto;
+            }
+
+            .category-header {
+                padding: 2rem 1rem;
+            }
+        }
     </style>
 </head>
 
@@ -77,9 +92,12 @@
             </div>
 
             <div class="nav-center" id="navCenter">
-                <a href="/category/Women" class="nav-link active"><i class="fa-solid fa-person-dress"></i> Women</a>
-                <a href="/category/Men" class="nav-link"><i class="fa-solid fa-user-tie"></i> Men</a>
-                <a href="/category/Kids" class="nav-link"><i class="fa-solid fa-child"></i> Kids</a>
+                <a href="/category/Women" class="nav-link {% if category_name == 'Women' %}active{% endif %}"><i
+                        class="fa-solid fa-person-dress"></i> Women</a>
+                <a href="/category/Men" class="nav-link {% if category_name == 'Men' %}active{% endif %}"><i
+                        class="fa-solid fa-user-tie"></i> Men</a>
+                <a href="/category/Kids" class="nav-link {% if category_name == 'Kids' %}active{% endif %}"><i
+                        class="fa-solid fa-child"></i> Kids</a>
             </div>
             <div class="nav-right" id="navRight">
                 <a href="/my_rentals" class="nav-action">

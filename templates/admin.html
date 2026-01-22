@@ -22,6 +22,17 @@
             border: 1px solid var(--border-color);
             height: fit-content;
         }
+
+        /* Responsive Admin */
+        @media (max-width: 900px) {
+            .admin-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar-form {
+                margin-bottom: 2rem;
+            }
+        }
     </style>
 </head>
 
@@ -80,41 +91,44 @@
                 <div style="color: var(--text-muted);">{{ items|length }} Items Listed</div>
             </div>
 
-            <table class="admin-table">
-                <thead>
-                    <tr>
-                        <th>Item</th>
-                        <th>Category</th>
-                        <th>Price</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in items %}
-                    <tr>
-                        <td>{{ item.name }}</td>
-                        <td>{{ item.category }}</td>
-                        <td>₹{{ item.price }}</td>
-                        <td>
-                            {% if item.availability %}
-                            <span style="color: green;">Available</span>
-                            {% else %}
-                            <span style="color: #999;">Unavailable</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <!-- Form to delete item -->
-                            <form
-                                action="/delete_item/{% if item.outfit_id %}{{ item.outfit_id }}{% else %}{{ item._id }}{% endif %}"
-                                method="POST" style="display:inline;">
-                                <button type="submit" class="action-btn delete-btn"><i class="fa fa-trash"></i></button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <div class="admin-table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                        <tr>
+                            <td>{{ item.name }}</td>
+                            <td>{{ item.category }}</td>
+                            <td>₹{{ item.price }}</td>
+                            <td>
+                                {% if item.availability %}
+                                <span style="color: green;">Available</span>
+                                {% else %}
+                                <span style="color: #999;">Unavailable</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <!-- Form to delete item -->
+                                <form
+                                    action="/delete_item/{% if item.outfit_id %}{{ item.outfit_id }}{% else %}{{ item._id }}{% endif %}"
+                                    method="POST" style="display:inline;">
+                                    <button type="submit" class="action-btn delete-btn"><i
+                                            class="fa fa-trash"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
 
     </div>
