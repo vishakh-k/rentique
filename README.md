@@ -1,4 +1,4 @@
-# Rentique - Premium Fashion Rental Platform
+inRentique - Premium Fashion Rental Platform
 
 Rentique is a web-based luxury rental application designed to bridge the gap between high-end fashion and accessibility. It allows users to browse and rent premium dresses, suits, and accessories for special occasions, while offering administrators a streamlined interface to manage inventory.
 
@@ -14,6 +14,8 @@ The main goal of Rentique is to provide a seamless, aesthetically pleasing platf
 - **Browse Collection**: View a curated list of items including Dresses, Jewelry, Men's Wear, and Kids' clothing.
 - **Search**: Real-time search functionality to filter items by name.
 - **Rental Interface**: Detailed item cards showing price per day and pickup availability.
+- **Manage Rentals**: View active bookings and cancel within a 2-hour window.
+- **Mobile Responsive**: Fully optimized layout for mobile devices with hamburger menu and touch-friendly interfaces.
 
 ### 🛡️ Admin Portal
 - **Dashboard**: A dedicated control panel for inventory management.
