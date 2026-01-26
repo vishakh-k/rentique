@@ -212,11 +212,24 @@ def cancel_rental(rental_id):
     if 'user' not in session:
         return redirect(url_for('index'))
     
+    booking = None
+    # 1. Try int (legacy/generated rental_id)
     try:
         r_id = int(rental_id)
         booking = bookings_collection.find_one({'rental_id': r_id})
-    except:
-        return redirect(url_for('my_rentals'))
+    except ValueError:
+        pass
+    
+    # 2. Try ObjectId (if passed from template fallback)
+    if not booking:
+        try:
+             booking = bookings_collection.find_one({'_id': ObjectId(rental_id)})
+        except:
+             pass
+
+    # 3. Try string (if rental_id was stored as string)
+    if not booking:
+        booking = bookings_collection.find_one({'rental_id': rental_id})
     
     if not booking:
         flash('Booking not found.')
@@ -225,38 +238,28 @@ def cancel_rental(rental_id):
     # Check time limit (2 hours)
     created_at = booking.get('created_at')
     if created_at:
-        # Ensure created_at is a datetime object (pymongo usually handles this if inserted as datetime)
-        time_diff = datetime.now() - created_at
-        hours_passed = time_diff.total_seconds() / 3600
-        
-        if hours_passed > 2:
-            flash('Cancellation period (2 hours) has expired.')
-            return redirect(url_for('my_rentals'))
-    else:
-        # If legacy record without timestamp, maybe allow or disallow. Let's allow for now or disallow.
-        # Safe choice: Allow if status is Pending, but for strict 2hr rule, maybe disallow.
-        # Let's assume new bookings only have created_at.
-        pass
+        try:
+            time_diff = datetime.now() - created_at
+            hours_passed = time_diff.total_seconds() / 3600
+            
+            if hours_passed > 2:
+                flash('Cancellation period (2 hours) has expired.')
+                return redirect(url_for('my_rentals'))
+        except:
+            pass
 
     # Update Booking Status
-    bookings_collection.update_one({'rental_id': r_id}, {'$set': {'status': 'Cancelled'}})
+    bookings_collection.update_one({'_id': booking['_id']}, {'$set': {'status': 'Cancelled'}})
     
     # Make item available again
     outfit_id = booking.get('outfit_id')
     if outfit_id:
         try:
-            # Try as integer ID first
             oid = int(outfit_id)
-            result = items_collection.update_one({'outfit_id': oid}, {'$set': {'availability': True}})
-            # If no document modified, maybe it's using _id or something else, but strictly our add_item uses int.
-            # But let's be safe for legacy/mixed data.
-            if result.modified_count == 0:
-                 # Check if it was an ObjectId string?
-                 pass
-        except ValueError:
-            # If convert to int fails, it might be an ObjectId string
+            items_collection.update_one({'outfit_id': oid}, {'$set': {'availability': True}})
+        except:
             try:
-                items_collection.update_one({'_id': ObjectId(outfit_id)}, {'$set': {'availability': True}})
+                items_collection.update_one({'_id': ObjectId(str(outfit_id))}, {'$set': {'availability': True}})
             except:
                 pass
 
@@ -268,11 +271,24 @@ def delete_rental(rental_id):
     if 'user' not in session:
         return redirect(url_for('index'))
     
+    booking = None
+    # 1. Try int
     try:
         r_id = int(rental_id)
         booking = bookings_collection.find_one({'rental_id': r_id})
-    except:
-        return redirect(url_for('my_rentals'))
+    except ValueError:
+        pass
+
+    # 2. Try ObjectId
+    if not booking:
+         try:
+             booking = bookings_collection.find_one({'_id': ObjectId(rental_id)})
+         except:
+             pass
+
+    # 3. Try string
+    if not booking:
+         booking = bookings_collection.find_one({'rental_id': rental_id})
     
     if booking:
         # If deleting an active/pending rental, we must release the item item
@@ -284,13 +300,15 @@ def delete_rental(rental_id):
                     items_collection.update_one({'outfit_id': oid}, {'$set': {'availability': True}})
                 except:
                      try:
-                        items_collection.update_one({'_id': ObjectId(outfit_id)}, {'$set': {'availability': True}})
+                        items_collection.update_one({'_id': ObjectId(str(outfit_id))}, {'$set': {'availability': True}})
                      except:
                         pass
         
-        # Remove from DB
-        bookings_collection.delete_one({'rental_id': r_id})
+        # Remove from DB using unique _id
+        bookings_collection.delete_one({'_id': booking['_id']})
         flash('Rental record deleted successfully.')
+    else:
+        flash('Error: Rental record not found.')
     
     return redirect(url_for('my_rentals'))
 
