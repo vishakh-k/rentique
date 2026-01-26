@@ -55,7 +55,7 @@ The main goal of Rentique is to provide a seamless, aesthetically pleasing platf
 
 ### Admin Access
 To access the Admin Console, use the following default credentials:
-- **Username**: `admin@aurawear.com`
+- **Username**: `admin@rentique.com`
 - **Password**: `admin123`
 
 ### User Access
