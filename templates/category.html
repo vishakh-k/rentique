@@ -132,16 +132,16 @@
 
     <!-- Filter Buttons (Visual Only for now) -->
     <div class="filter-bar">
-        <button class="filter-btn active">All</button>
-        <button class="filter-btn">Clothes</button>
-        <button class="filter-btn">Jewellery</button>
+        <button class="filter-btn active" onclick="filterItems('all')">All</button>
+        <button class="filter-btn" onclick="filterItems('clothes')">Clothes</button>
+        <button class="filter-btn" onclick="filterItems('jewellery')">Jewellery</button>
     </div>
 
     <div class="container" style="padding: 2rem 0;">
-        <div class="items-grid">
+        <div class="items-grid" id="itemsGrid">
             {% if items %}
             {% for item in items %}
-            <div class="item-card">
+            <div class="item-card" data-category="{{ item.category }}">
                 <div class="item-image">
                     {% if item.image %}
                     <img src="{{ item.image }}" alt="{{ item.name }}"
@@ -182,6 +182,55 @@
         </div>
     </div>
 
+    <script>
+        function filterItems(filterType) {
+            // Update buttons
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            // Find the button that was clicked (approximate matching since passed string varies)
+            // Or simpler: event.target handling if I passed 'this'
+            // Since I passed a string, I'll just match text content or index
+            if (filterType === 'all') buttons[0].classList.add('active');
+            if (filterType === 'clothes') buttons[1].classList.add('active');
+            if (filterType === 'jewellery') buttons[2].classList.add('active');
+
+            const items = document.querySelectorAll('.item-card');
+            const clothingKeywords = ['dress', 'saree', 'lehenga', 'gown', 'suit', 'sherwani', 'kurta', 'shirt', 'pant', 'wear', 'outfit', 'clothing', 'top', 'bottom', 'jacket'];
+            const jewelleryKeywords = ['jewellery', 'jewelry', 'necklace', 'earring', 'bangle', 'bracelet', 'ring', 'accessory', 'accessories', 'watch', 'bag', 'purse'];
+
+            let hasVisibleItems = false;
+
+            items.forEach(item => {
+                const category = item.getAttribute('data-category').toLowerCase();
+                let show = false;
+
+                if (filterType === 'all') {
+                    show = true;
+                } else if (filterType === 'clothes') {
+                    // Check if any clothing keyword is present
+                    if (clothingKeywords.some(keyword => category.includes(keyword))) {
+                        show = true;
+                    }
+                } else if (filterType === 'jewellery') {
+                    // Check if any jewellery keyword is present
+                    if (jewelleryKeywords.some(keyword => category.includes(keyword))) {
+                        show = true;
+                    }
+                }
+
+                if (show) {
+                    item.style.display = 'block';
+                    hasVisibleItems = true;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            // Handle "No items found" message if needed, but existing template has a fallback for empty server-side list.
+            // We might want to add a client-side "No items found" message if filtering hides everything.
+        }
+    </script>
 </body>
 
 </html>
