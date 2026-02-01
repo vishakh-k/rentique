@@ -187,10 +187,16 @@ def book_item(item_id):
             user_id = user_rec.get('user_id', 0)
     
     # Insert Booking
+    # Fetch latest user details (especially phone which isn't in session)
+    user_details = users_collection.find_one({'user_id': user_id})
+    user_phone = user_details.get('phone') if user_details else None
+    
     bookings_collection.insert_one({
         'rental_id': rental_id,
         'user_id': user_id,
         'user_email': session.get('user'),
+        'user_name': session.get('name'),
+        'user_phone': user_phone,
         'outfit_id': item.get('outfit_id', str(item['_id'])),
         'rental_date': start_date_str,
         'return_date': end_date_str,
@@ -377,7 +383,76 @@ def admin():
          return redirect(url_for('index'))
     
     items = list(items_collection.find())
-    return render_template('admin.html', items=items)
+    bookings = list(bookings_collection.find().sort('created_at', -1))
+    
+    # Enrich bookings with user data for display if missing
+    for booking in bookings:
+        # If user_name not directly saved, fetch from Users
+        if 'user_name' not in booking or 'user_phone' not in booking:
+             user_data = None
+             if booking.get('user_id'):
+                  user_data = users_collection.find_one({'user_id': booking['user_id']})
+             
+             if not user_data and booking.get('user_email'):
+                  user_data = users_collection.find_one({'email': booking['user_email']})
+                  
+             if user_data:
+                  booking['user_name'] = booking.get('user_name') or user_data.get('name')
+                  booking['user_phone'] = booking.get('user_phone') or user_data.get('phone')
+             
+             # Fallback if still no name
+             if not booking.get('user_name'):
+                 booking['user_name'] = "User ID: " + str(booking.get('user_id'))
+    
+    return render_template('admin.html', items=items, bookings=bookings)
+
+@app.route('/update_booking_status/<booking_id>/<new_status>', methods=['POST'])
+def update_booking_status(booking_id, new_status):
+    if 'user' not in session:
+        return redirect(url_for('index'))
+    if session.get('role') != 'Admin' and session.get('role') != 'admin':
+        return redirect(url_for('index'))
+        
+    # Find booking
+    booking = None
+    try:
+         booking = bookings_collection.find_one({'rental_id': int(booking_id)})
+    except:
+         pass
+    
+    if not booking:
+         booking = bookings_collection.find_one({'_id': ObjectId(booking_id)})
+    
+    if booking:
+        updates = {'status': new_status}
+        
+        # If marked as Returned, make item available again
+        if new_status == 'Returned':
+            outfit_id = booking.get('outfit_id')
+            if outfit_id:
+                try:
+                    oid = int(outfit_id)
+                    items_collection.update_one({'outfit_id': oid}, {'$set': {'availability': True}})
+                except:
+                    try:
+                         items_collection.update_one({'_id': ObjectId(str(outfit_id))}, {'$set': {'availability': True}})
+                    except:
+                         pass
+        
+        # If marked as Confirmed, ensure item is unavailable (redundant check but good practice)
+        if new_status == 'Confirmed':
+            outfit_id = booking.get('outfit_id')
+            if outfit_id:
+                try:
+                    oid = int(outfit_id)
+                    items_collection.update_one({'outfit_id': oid}, {'$set': {'availability': False}})
+                except:
+                    pass
+
+        bookings_collection.update_one({'_id': booking['_id']}, {'$set': updates})
+        flash(f'Booking marked as {new_status}.')
+    
+    return redirect(url_for('admin'))
 
 # --- Admin Operations ---
 

@@ -23,6 +23,29 @@
             height: fit-content;
         }
 
+        .tab-btn {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 0.6rem 2rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .tab-btn:hover {
+            background: rgba(210, 180, 140, 0.1);
+        }
+
+        .tab-btn.active {
+            background: var(--primary-color);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(210, 180, 140, 0.4);
+        }
+
         /* Responsive Admin */
         @media (max-width: 900px) {
             .admin-layout {
@@ -95,57 +118,184 @@
             </form>
         </div>
 
-        <!-- Inventory List -->
-        <div class="inventory-list">
-            <div class="admin-header" style="margin-top: 0; padding-top: 0;">
-                <h2>Current Inventory</h2>
-                <div style="color: var(--text-muted);">{{ items|length }} Items Listed</div>
+        <!-- Main Content Area -->
+        <div class="main-content" style="flex: 1;">
+
+            <!-- Tabs -->
+            <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+                <button onclick="showTab('inventory')" id="tab-inventory" class="tab-btn active">Inventory</button>
+                <button onclick="showTab('rentals')" id="tab-rentals" class="tab-btn">Rentals / Orders</button>
             </div>
 
-            <div class="admin-table-container">
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Item</th>
-                            <th>Category</th>
-                            <th>Price</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in items %}
-                        <tr>
-                            <td>{{ item.name }}</td>
-                            <td>{{ item.category }}</td>
-                            <td>₹{{ item.price }}</td>
-                            <td>
-                                {% if item.availability %}
-                                <span style="color: green;">Available</span>
-                                {% else %}
-                                <span style="color: #999;">Unavailable</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <a href="/edit_item/{% if item.outfit_id %}{{ item.outfit_id }}{% else %}{{ item._id }}{% endif %}"
-                                    style="background: #555; color: white; padding: 6px 10px; border-radius: 5px; margin-right: 5px; display: inline-block;"
-                                    title="Edit Item">
-                                    <i class="fa fa-pencil"></i>
-                                </a>
-                                <!-- Form to delete item -->
-                                <form
-                                    action="/delete_item/{% if item.outfit_id %}{{ item.outfit_id }}{% else %}{{ item._id }}{% endif %}"
-                                    method="POST" style="display:inline;">
-                                    <button type="submit" class="action-btn delete-btn"><i
-                                            class="fa fa-trash"></i></button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+            <!-- Inventory Tab -->
+            <div id="content-inventory" class="tab-content" style="display: block;">
+                <div class="admin-header" style="margin-top: 0; padding-top: 0;">
+                    <h2>Current Inventory</h2>
+                    <div style="color: var(--text-muted);">{{ items|length }} Items Listed</div>
+                </div>
+
+                <div class="admin-table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr>
+                                <td>{{ item.name }}</td>
+                                <td>{{ item.category }}</td>
+                                <td>₹{{ item.price }}</td>
+                                <td>
+                                    {% if item.availability %}
+                                    <span style="color: green;">Available</span>
+                                    {% else %}
+                                    <span style="color: #999;">Unavailable</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="/edit_item/{% if item.outfit_id %}{{ item.outfit_id }}{% else %}{{ item._id }}{% endif %}"
+                                        style="background: #555; color: white; padding: 6px 10px; border-radius: 5px; margin-right: 5px; display: inline-block;"
+                                        title="Edit Item">
+                                        <i class="fa fa-pencil"></i>
+                                    </a>
+                                    <!-- Form to delete item -->
+                                    <form
+                                        action="/delete_item/{% if item.outfit_id %}{{ item.outfit_id }}{% else %}{{ item._id }}{% endif %}"
+                                        method="POST" style="display:inline;">
+                                        <button type="submit" class="action-btn delete-btn"><i
+                                                class="fa fa-trash"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
+
+            <!-- Rentals Tab -->
+            <div id="content-rentals" class="tab-content" style="display: none;">
+                <div class="admin-header" style="margin-top: 0; padding-top: 0;">
+                    <h2>Rentals & Orders</h2>
+                    <div style="color: var(--text-muted);">{{ bookings|length }} Bookings Found</div>
+                </div>
+
+                <div class="admin-table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Rental ID</th>
+                                <th>User</th>
+                                <th>Item</th>
+                                <th>Dates</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if bookings %}
+                            {% for booking in bookings %}
+                            <tr>
+                                <td>#{{ booking.rental_id }}</td>
+                                <td>
+                                    <div style="font-weight: 500;">{{ booking.user_email }}</div>
+                                    {% if booking.user_name %}
+                                    <div style="font-size: 0.8rem; color: #777;">{{ booking.user_name }}</div>
+                                    {% endif %}
+                                    <div style="font-size: 0.8rem; color: #777;">ID: {{ booking.user_id }}</div>
+                                    {% if booking.user_phone %}
+                                    <div style="font-size: 0.8rem; color: #777;"><i class="fa fa-phone"
+                                            style="font-size:0.7rem;"></i> {{ booking.user_phone }}</div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {{ booking.item_name }}
+                                    <div style="font-size: 0.8rem; color: #999;">{{ booking.category }}</div>
+                                </td>
+                                <td>
+                                    {{ booking.rental_date }} <br> to <br> {{ booking.return_date }}
+                                </td>
+                                <td>₹{{ booking.total_amount }}</td>
+                                <td>
+                                    {% if booking.status == 'Cancelled' %}
+                                    <span
+                                        style="color: #c62828; font-weight: bold; background: #FFEBEE; padding: 4px 8px; border-radius: 4px;">Cancelled</span>
+
+                                    {% elif booking.status == 'Returned' %}
+                                    <span
+                                        style="color: #555; font-weight: bold; background: #eee; padding: 4px 8px; border-radius: 4px;">Returned</span>
+
+                                    {% else %}
+                                    <!-- Current Status Display -->
+                                    <div style="margin-bottom: 5px;">
+                                        {% if booking.status == 'Pending' %}
+                                        <span style="color: #f57f17; font-weight: bold;">{{ booking.status }}</span>
+                                        {% else %}
+                                        <span style="color: green; font-weight: bold;">{{ booking.status }}</span>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Actions -->
+                                    <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                                        {% if booking.status == 'Pending' %}
+                                        <form
+                                            action="/update_booking_status/{{ booking.rental_id if booking.rental_id else booking._id }}/Confirmed"
+                                            method="POST">
+                                            <button type="submit"
+                                                style="background: var(--primary-color); color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.75rem;">
+                                                Confirm
+                                            </button>
+                                        </form>
+                                        {% endif %}
+
+                                        {% if booking.status == 'Confirmed' %}
+                                        <form
+                                            action="/update_booking_status/{{ booking.rental_id if booking.rental_id else booking._id }}/Returned"
+                                            method="POST">
+                                            <button type="submit"
+                                                style="background: #e0e0e0; color: #333; border: 1px solid #ccc; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.75rem;">
+                                                Mark Returned
+                                            </button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 2rem;">No bookings found.</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
+
+        <script>
+            function showTab(tabName) {
+                // Hide all contents
+                document.getElementById('content-inventory').style.display = 'none';
+                document.getElementById('content-rentals').style.display = 'none';
+
+                // Remove active class from buttons
+                document.getElementById('tab-inventory').classList.remove('active');
+                document.getElementById('tab-rentals').classList.remove('active');
+
+                // Show selected
+                document.getElementById('content-' + tabName).style.display = 'block';
+                document.getElementById('tab-' + tabName).classList.add('active');
+            }
+        </script>
 
     </div>
 
