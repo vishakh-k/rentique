@@ -43,9 +43,11 @@
                     <span>My Rentals</span>
                 </a>
 
-                <div class="user-profile-circle">
-                    V
-                </div>
+                <a href="/profile" style="text-decoration: none;">
+                    <div class="user-profile-circle">
+                        {{ session.get('name', 'User')[0] | upper }}
+                    </div>
+                </a>
                 <!-- Keeping Logout accessible via small text/icon if needed, or imply it's in the profile menu -->
                 <form action="/logout" method="POST" style="display:inline; margin-left: 10px;">
                     <button type="submit"

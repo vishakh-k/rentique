@@ -58,6 +58,7 @@ def register():
     # Auto login
     session['user'] = email
     session['user_id'] = user_id
+    session['name'] = name
     session['role'] = 'User'
     return redirect(url_for('home'))
 
@@ -77,12 +78,14 @@ def login():
         session['user'] = 'admin@rentique.com'
         session['role'] = 'Admin'
         session['user_id'] = 1 # Static ID for superadmin
+        session['name'] = 'Admin'
         return redirect(url_for('admin'))
 
     if user and user['password'] == password:
         session['user'] = user['email']
         session['user_id'] = user.get('user_id')
         session['role'] = user.get('role', 'User')
+        session['name'] = user.get('name', 'User')
         
         if session['role'] == 'Admin':
             return redirect(url_for('admin'))
@@ -115,8 +118,8 @@ def category_page(category_name):
     if 'user' not in session:
         return redirect(url_for('index'))
     
-    # Flexible regex search to find "Women" in "Women - Dress" etc.
-    items = list(items_collection.find({'category': {'$regex': category_name, '$options': 'i'}}))
+    # Strict regex search to find "Men" only at start, to avoid matching "Women"
+    items = list(items_collection.find({'category': {'$regex': f'^{category_name}', '$options': 'i'}}))
     
     return render_template('category.html', items=items, category_name=category_name)
 
@@ -187,11 +190,13 @@ def book_item(item_id):
     bookings_collection.insert_one({
         'rental_id': rental_id,
         'user_id': user_id,
+        'user_email': session.get('user'),
         'outfit_id': item.get('outfit_id', str(item['_id'])),
         'rental_date': start_date_str,
         'return_date': end_date_str,
         'total_amount': total_amount,
         'item_name': item['name'],
+        'category': item.get('category'),
         'image': item.get('image'),
         'status': 'Pending',
         'created_at': datetime.now(), # Store creation time for cancellation logic
@@ -326,6 +331,43 @@ def my_rentals():
     # Pass current time for template comparison if needed, though backend handles the action
     return render_template('my_rentals.html', bookings=user_bookings, now=datetime.now(), timedelta=lambda x: x.total_seconds()/3600)
 
+@app.route('/profile', methods=['GET', 'POST'])
+def profile():
+    if 'user' not in session:
+        return redirect(url_for('index'))
+    
+    # Fetch user details
+    user_id = session.get('user_id')
+    user = None
+    if user_id:
+        user = users_collection.find_one({'user_id': user_id})
+    
+    if not user:
+         user = users_collection.find_one({'email': session['user']})
+
+    if request.method == 'POST':
+        new_name = request.form.get('name')
+        new_email = request.form.get('email')
+        new_password = request.form.get('password')
+        
+        update_data = {
+            'name': new_name,
+            'email': new_email
+        }
+        if new_password:
+             update_data['password'] = new_password
+             
+        users_collection.update_one({'_id': user['_id']}, {'$set': update_data})
+        
+        # Update session
+        session['user'] = new_email
+        session['name'] = new_name
+        
+        flash('Profile updated successfully!')
+        return redirect(url_for('profile'))
+        
+    return render_template('profile.html', user=user)
+
 @app.route('/admin')
 def admin():
     if 'user' not in session:
@@ -350,10 +392,14 @@ def add_item():
     
     outfit_id = generate_id()
     
+    main_cat = request.form.get('main_category')
+    sub_cat = request.form.get('sub_category')
+    category = f"{main_cat} - {sub_cat}"
+    
     items_collection.insert_one({
         'outfit_id': outfit_id,
         'name': request.form.get('name'),
-        'category': request.form.get('category'), # Keeping for flow
+        'category': category,
         'price': float(request.form.get('price')),
         'description': request.form.get('description'),
         'image': request.form.get('image'), # was image_url
@@ -361,6 +407,52 @@ def add_item():
         'pickup_date': request.form.get('pickup_date') # Keeping usage
     })
     return redirect(url_for('admin'))
+
+@app.route('/edit_item/<item_id>', methods=['GET', 'POST'])
+def edit_item(item_id):
+    if 'user' not in session:
+        return redirect(url_for('index'))
+    if session.get('role') != 'Admin' and session.get('role') != 'admin':
+        return redirect(url_for('index'))
+
+    # Locate Item
+    try:
+        query_id = int(item_id)
+        item = items_collection.find_one({'outfit_id': query_id})
+    except ValueError:
+        item = items_collection.find_one({'_id': ObjectId(item_id)})
+    
+    if not item:
+        flash('Item not found')
+        return redirect(url_for('admin'))
+
+    if request.method == 'POST':
+        # Update Logic
+        main_cat = request.form.get('main_category')
+        sub_cat = request.form.get('sub_category')
+        category = f"{main_cat} - {sub_cat}"
+
+        updated_data = {
+            'name': request.form.get('name'),
+            'category': category,
+            'price': float(request.form.get('price')),
+            'description': request.form.get('description'),
+            'image': request.form.get('image'),
+        }
+        
+        # If admin wants to force availability reset (optional feature, maybe strictly for fixing issues)
+        if request.form.get('availability') == 'on':
+             updated_data['availability'] = True
+        
+        if item.get('outfit_id'):
+            items_collection.update_one({'outfit_id': item['outfit_id']}, {'$set': updated_data})
+        else:
+            items_collection.update_one({'_id': item['_id']}, {'$set': updated_data})
+            
+        flash('Item updated successfully')
+        return redirect(url_for('admin'))
+        
+    return render_template('edit_item.html', item=item)
 
 @app.route('/delete_item/<item_id>', methods=['POST'])
 def delete_item(item_id):

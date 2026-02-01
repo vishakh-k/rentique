@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rentique | My Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=2">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .profile-container {
+            max-width: 600px;
+            margin: 4rem auto;
+            padding: 2rem;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: #fff;
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem auto;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(210, 180, 140, 0.2);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="container nav-content">
+            <div class="nav-left">
+                <a href="/home" class="nav-logo" style="display: block;">
+                    <img src="{{ url_for('static', filename='images/rentique_brand_logo.png') }}" alt="Rentique"
+                        class="nav-logo-img">
+                </a>
+            </div>
+
+            <div class="mobile-menu-btn" onclick="toggleMenu()">
+                <i class="fa-solid fa-bars"></i>
+            </div>
+
+            <div class="nav-center" id="navCenter">
+                <a href="/category/Women" class="nav-link"><i class="fa-solid fa-person-dress"></i> Women</a>
+                <a href="/category/Men" class="nav-link"><i class="fa-solid fa-user-tie"></i> Men</a>
+                <a href="/category/Kids" class="nav-link"><i class="fa-solid fa-child"></i> Kids</a>
+            </div>
+
+            <div class="nav-right" id="navRight">
+                <a href="/my_rentals" class="nav-action">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <span>My Rentals</span>
+                </a>
+
+                <a href="/profile" style="text-decoration: none;">
+                    <div class="user-profile-circle">
+                        {{ session.get('name', 'User')[0] | upper }}
+                    </div>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <script>
+        function toggleMenu() {
+            const navCenter = document.getElementById('navCenter');
+            const navRight = document.getElementById('navRight');
+            navCenter.classList.toggle('active');
+            navRight.classList.toggle('active');
+        }
+    </script>
+
+    <div class="container">
+        <div class="profile-container">
+
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    {{ user.name[0] | upper if user.name else 'U' }}
+                </div>
+                <h2 style="font-family: 'Playfair Display', serif;">Edit Profile</h2>
+                <p style="color: var(--text-muted);">Update your personal details</p>
+            </div>
+
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <div
+                style="background: #E8F5E9; color: #2E7D32; padding: 1rem; border-radius: 8px; margin-bottom: 2rem; border: 1px solid #C8E6C9; text-align: center;">
+                {% for message in messages %}
+                {{ message }}
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+
+            <form action="/profile" method="POST">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="name" class="form-control" value="{{ user.name }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" class="form-control" value="{{ user.email }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>New Password (leave blank to keep current)</label>
+                    <input type="password" name="password" class="form-control" placeholder="••••••••">
+                </div>
+
+                <div class="action-buttons">
+                    <button type="submit" class="btn btn-primary" style="flex: 1; text-align: center;">Save
+                        Changes</button>
+                    <a href="/home" class="btn btn-outline"
+                        style="flex: 1; text-align: center; border: 1px solid #ddd; color: #666;">Cancel</a>
+                </div>
+            </form>
+
+            <div style="text-align: center; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #eee;">
+                <form action="/logout" method="POST">
+                    <button type="submit"
+                        style="background: none; border: none; color: #d32f2f; cursor: pointer; font-size: 0.9rem; text-decoration: underline;">
+                        Sign Out of Account
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

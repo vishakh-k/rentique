@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rentique | Edit Item</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=2">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .sidebar-form {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+            height: fit-content;
+        }
+
+        label {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="container nav-content">
+            <div class="nav-logo brand-font">Rentique <span
+                    style="font-size: 1rem; color: var(--text-muted); font-family: 'Outfit';">| Admin</span></div>
+            <form action="/logout" method="POST" style="margin:0;">
+                <button type="submit" class="btn btn-outline">Logout</button>
+            </form>
+        </div>
+    </nav>
+
+    <div class="container" style="padding: 2rem 0; max-width: 600px;">
+        <div class="sidebar-form" style="width: 100%; box-shadow: 0 5px 20px rgba(0,0,0,0.1);">
+            <h3 style="margin-bottom: 1.5rem; color: var(--primary-color);">Edit Inventory Item</h3>
+            <form action="/edit_item/{% if item.outfit_id %}{{ item.outfit_id }}{% else %}{{ item._id }}{% endif %}"
+                method="POST">
+
+                <label>Item Name</label>
+                <input type="text" name="name" required value="{{ item.name }}"
+                    placeholder="e.g. Royal Blue Silk Saree">
+
+                <label>Category (Currently: {{ item.category }})</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    {% set parts = item.category.split(' - ') %}
+                    {% set main_cat = parts[0] if parts|length > 0 else '' %}
+                    {% set sub_cat = parts[1] if parts|length > 1 else '' %}
+
+                    <select name="main_category" required>
+                        <option value="Women" {% if main_cat=='Women' %}selected{% endif %}>Women</option>
+                        <option value="Men" {% if main_cat=='Men' %}selected{% endif %}>Men</option>
+                        <option value="Kids" {% if main_cat=='Kids' %}selected{% endif %}>Kids</option>
+                    </select>
+
+                    <select name="sub_category" required>
+                        <option value="Clothing" {% if sub_cat=='Clothing' %}selected{% endif %}>Clothing</option>
+                        <option value="Dress" {% if sub_cat=='Dress' %}selected{% endif %}>Dress</option>
+                        <option value="Saree" {% if sub_cat=='Saree' %}selected{% endif %}>Saree</option>
+                        <option value="Suit" {% if sub_cat=='Suit' %}selected{% endif %}>Suit</option>
+                        <option value="Sherwani" {% if sub_cat=='Sherwani' %}selected{% endif %}>Sherwani</option>
+                        <option value="Jewelry" {% if sub_cat=='Jewelry' or sub_cat=='Jewellery' %}selected{% endif %}>
+                            Jewelry</option>
+                        <option value="Accessories" {% if sub_cat=='Accessories' %}selected{% endif %}>Accessories
+                        </option>
+                        <!-- Fallback for old data -->
+                        <option value="Wear" {% if sub_cat=='Wear' %}selected{% endif %}>Wear</option>
+                    </select>
+                </div>
+
+                <label>Rental Price (₹)</label>
+                <input type="number" name="price" required value="{{ item.price }}" placeholder="1500">
+
+                <label>Description</label>
+                <textarea name="description" placeholder="Details about the outfit..."
+                    style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 1rem; font-family: inherit; min-height: 100px;">{{ item.description }}</textarea>
+
+                <label>Image (Path or URL)</label>
+                <input type="text" name="image" value="{{ item.image }}" placeholder="Image file name or URL">
+
+                <div
+                    style="margin: 1rem 0; display: flex; align-items: center; gap: 10px; background: #f9f9f9; padding: 10px; border-radius: 8px;">
+                    <input type="checkbox" name="availability" id="availability" style="width: auto; margin-bottom: 0;">
+                    <label for="availability" style="margin-bottom: 0; cursor: pointer;">Reset Availability to True
+                        (Force Available)</label>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Update Item</button>
+                    <a href="/admin" class="btn btn-outline"
+                        style="flex: 1; text-align: center; border: 1px solid #ccc; color: #555;">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</body>
+
+</html>

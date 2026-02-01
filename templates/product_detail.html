@@ -166,7 +166,9 @@
                     <i class="fa-solid fa-bag-shopping"></i>
                     <span>My Rentals</span>
                 </a>
-                <div class="user-profile-circle">V</div>
+                <a href="/profile" style="text-decoration: none;">
+                    <div class="user-profile-circle">{{ session.get('name', 'User')[0] | upper }}</div>
+                </a>
             </div>
         </div>
     </nav>

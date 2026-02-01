@@ -59,13 +59,24 @@
                 <input type="text" name="name" required placeholder="e.g. Royal Blue Silk Saree">
 
                 <label style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block;">Category</label>
-                <select name="category" required>
-                    <option value="Women - Dress">Women - Dress</option>
-                    <option value="Women - Jewelry">Women - Jewelry</option>
-                    <option value="Men - Wear">Men - Wear</option>
-                    <option value="Men - Accessories">Men - Accessories</option>
-                    <option value="Kids">Kids</option>
-                </select>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <select name="main_category" required>
+                        <option value="" disabled selected>Target Audience</option>
+                        <option value="Women">Women</option>
+                        <option value="Men">Men</option>
+                        <option value="Kids">Kids</option>
+                    </select>
+                    <select name="sub_category" required>
+                        <option value="" disabled selected>Item Type</option>
+                        <option value="Clothing">Clothing</option>
+                        <option value="Dress">Dress</option>
+                        <option value="Saree">Saree</option>
+                        <option value="Suit">Suit</option>
+                        <option value="Sherwani">Sherwani</option>
+                        <option value="Jewelry">Jewelry</option>
+                        <option value="Accessories">Accessories</option>
+                    </select>
+                </div>
 
                 <label style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block;">Rental Price (₹)</label>
                 <input type="number" name="price" required placeholder="1500">
@@ -116,6 +127,11 @@
                                 {% endif %}
                             </td>
                             <td>
+                                <a href="/edit_item/{% if item.outfit_id %}{{ item.outfit_id }}{% else %}{{ item._id }}{% endif %}"
+                                    style="background: #555; color: white; padding: 6px 10px; border-radius: 5px; margin-right: 5px; display: inline-block;"
+                                    title="Edit Item">
+                                    <i class="fa fa-pencil"></i>
+                                </a>
                                 <!-- Form to delete item -->
                                 <form
                                     action="/delete_item/{% if item.outfit_id %}{{ item.outfit_id }}{% else %}{{ item._id }}{% endif %}"
