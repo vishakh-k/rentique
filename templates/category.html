@@ -137,6 +137,7 @@
         <button class="filter-btn active" onclick="filterItems('all')">All</button>
         <button class="filter-btn" onclick="filterItems('clothes')">Clothes</button>
         <button class="filter-btn" onclick="filterItems('jewellery')">Jewellery</button>
+        <button class="filter-btn" onclick="filterItems('footwear')">Footwear</button>
     </div>
 
     <div class="container" style="padding: 2rem 0;">
@@ -190,16 +191,15 @@
             const buttons = document.querySelectorAll('.filter-btn');
             buttons.forEach(btn => btn.classList.remove('active'));
 
-            // Find the button that was clicked (approximate matching since passed string varies)
-            // Or simpler: event.target handling if I passed 'this'
-            // Since I passed a string, I'll just match text content or index
             if (filterType === 'all') buttons[0].classList.add('active');
             if (filterType === 'clothes') buttons[1].classList.add('active');
             if (filterType === 'jewellery') buttons[2].classList.add('active');
+            if (filterType === 'footwear') buttons[3].classList.add('active');
 
             const items = document.querySelectorAll('.item-card');
             const clothingKeywords = ['dress', 'saree', 'lehenga', 'gown', 'suit', 'sherwani', 'kurta', 'shirt', 'pant', 'wear', 'outfit', 'clothing', 'top', 'bottom', 'jacket'];
             const jewelleryKeywords = ['jewellery', 'jewelry', 'necklace', 'earring', 'bangle', 'bracelet', 'ring', 'accessory', 'accessories', 'watch', 'bag', 'purse'];
+            const footwearKeywords = ['shoe', 'shoes', 'footwear', 'sandal', 'boot', 'slipper', 'heel', 'sneaker', 'juti', 'mojari'];
 
             let hasVisibleItems = false;
 
@@ -210,13 +210,15 @@
                 if (filterType === 'all') {
                     show = true;
                 } else if (filterType === 'clothes') {
-                    // Check if any clothing keyword is present
-                    if (clothingKeywords.some(keyword => category.includes(keyword))) {
+                    if (clothingKeywords.some(keyword => category.includes(keyword)) && !footwearKeywords.some(keyword => category.includes(keyword))) {
                         show = true;
                     }
                 } else if (filterType === 'jewellery') {
-                    // Check if any jewellery keyword is present
                     if (jewelleryKeywords.some(keyword => category.includes(keyword))) {
+                        show = true;
+                    }
+                } else if (filterType === 'footwear') {
+                    if (footwearKeywords.some(keyword => category.includes(keyword))) {
                         show = true;
                     }
                 }
@@ -228,9 +230,6 @@
                     item.style.display = 'none';
                 }
             });
-
-            // Handle "No items found" message if needed, but existing template has a fallback for empty server-side list.
-            // We might want to add a client-side "No items found" message if filtering hides everything.
         }
     </script>
 </body>
